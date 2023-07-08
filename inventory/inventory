@@ -1,0 +1,2 @@
+[vm_hosts]
+localhost ansible_connection=local remote_user=chouaieb

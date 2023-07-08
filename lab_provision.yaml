@@ -1,0 +1,31 @@
+---
+- name: Provision vms lab
+  hosts: vm_hosts
+  become: true
+
+  tasks:
+    - name: Include role kvm_provision
+      ansible.builtin.include_role:
+        name: kvm_provision
+      vars:
+        vm_name: "{{ item.vm_name }}"
+        hostname: "{{ item.hostname }}"
+        base_image_name: "{{ item.base_image_name }}"
+      loop: "{{ vm_list }}"
+
+    - name: Add vm hostname to vm_guests group
+      ansible.builtin.add_host:
+        host: "{{ item.hostname }}"
+        group: vm_guests
+      loop: "{{ vm_list }}"
+      changed_when: false
+
+- name: Configure vm
+  hosts: vm_guests
+  remote_user: root
+
+  tasks:
+    - name: Include role host_configure
+      ansible.builtin.include_role:
+        name: host_configure
+      when: configure_hosts != "False"
